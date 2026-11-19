@@ -28,6 +28,7 @@ Open `index.html` in a browser, or enable GitHub Pages (Settings → Pages → `
 index.html     page shell + HUD markup
 css/style.css  HUD and overlay styles
 js/config.js    constants
+js/assets.js    baked models + textures (generated)
 js/engine.js    renderer, scene, camera, mesh helpers
 js/audio.js     procedural sounds
 js/world.js     street, lamps, crates, toys
@@ -35,6 +36,8 @@ js/dogs.js      dog AI, noise reactions, bites
 js/player.js    input, movement, physics
 js/main.js      game loop, HUD
 ```
+
+assets/ holds the source models (glb/fbx) and textures. After changing them run `python3 tools/bake_assets.py` to regenerate `js/assets.js` (needs Python + numpy).
 
 ## Status
 - [x] Level 1

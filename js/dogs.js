@@ -2,13 +2,14 @@
 // dogs
 const dogs=[];
 for(const[x,z]of[[-2,-14],[3,-31],[-3,-47]]){
- const g=new THREE.Group();const c=0x9a7b55;
- const add=(w,h,d,px,py,pz,col)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(col||c));m.position.set(px,py,pz);g.add(m);return m};
- add(.5,.45,1);const head=add(.4,.38,.4,0,.25,.65);add(.12,.2,.1,-.14,.52,.65,0x5a4430);add(.12,.2,.1,.14,.52,.65,0x5a4430);add(.1,.1,.4,0,.1,-.7,0x5a4430);
- const ind=new THREE.Mesh(new THREE.SphereGeometry(.12,6,4),new THREE.MeshBasicMaterial({color:0x44ff88}));ind.position.y=1.4;g.add(ind);
- g.position.set(x,.3,z);g.rotation.y=Math.random()*6;S.add(g);
+ const g=new THREE.Group();
+ const head=model('dog',.5,0x2a1c1c);S.remove(head);g.add(head);
+ const ind=new THREE.Mesh(new THREE.SphereGeometry(.12,6,4),new THREE.MeshBasicMaterial({color:0x44ff88}));ind.position.y=1.3;g.add(ind);
+ g.position.set(x,0,z);g.rotation.y=Math.random()*6;S.add(g);
  dogs.push({g,head,ind,hx:x,hz:z,x,z,st:0,al:0,lose:0,ret:false,cd:0,base:4});}
 
+function hitItem(t){if(t.kind==='vase'){t.dead=true;t.m.visible=false;snd(500,.5,'sawtooth',.2);snd(2200,.25,'square',.08);P.noise=1;
+ for(const d of dogs)if(d.st===0&&Math.hypot(d.x-t.m.position.x,d.z-t.m.position.z)<12)d.al=1;}else squeak(t.m.position.x,t.m.position.z);}
 function squeak(x,z){snd(1400,.15,'sine',.15);P.noise=1;
  for(const d of dogs)if(d.st===0&&Math.hypot(d.x-x,d.z-z)<10){d.al=1;}}
 

@@ -9,7 +9,7 @@ const keys={};let locked=false,AC=null,bite_cd=0;
 const $=id=>document.getElementById(id);
 function reset(){Object.assign(P,{x:0,y:0,z:0,vy:0,yaw:0,pit:0,stam:1,tired:false,bites:0,slow:0,noise:0,won:false});
  for(const d of dogs){Object.assign(d,{x:d.hx,z:d.hz,st:0,al:0,lose:0,ret:false,cd:0});}
- for(const t of toys){t.carried=false;t.hot=false;t.m.position.set(t.hx,.15,t.hz);t.m.visible=true;}held=null;$('msg').textContent='';}
+ for(const t of toys){t.carried=false;t.hot=false;t.dead=false;t.m.position.set(t.hx,t.y0,t.hz);t.m.visible=true;}held=null;$('msg').textContent='';}
 addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space'||e.code.startsWith('Arrow'))e.preventDefault();if(e.code==='KeyR')reset();});
 addEventListener('keyup',e=>keys[e.code]=false);
 $('ov').onclick=()=>{AC=AC||new(window.AudioContext||window.webkitAudioContext)();R.domElement.requestPointerLock&&R.domElement.requestPointerLock();$('ov').style.display='none';locked=true;};
@@ -33,15 +33,15 @@ function update(dt){
  const g=groundAt(P.x,P.y);
  if(keys.Space&&P.y<=g+.01&&!jumpLatch){P.vy=6.5;jumpLatch=true;}if(!keys.Space)jumpLatch=false;
  P.vy-=18*dt;P.y+=P.vy*dt;const g2=groundAt(P.x,P.y+.3);if(P.y<g2){P.y=g2;P.vy=0;}
- const safe=P.y>=.7&&g2>=.9;
+ const safe=P.y>=.7&&g2>=.8;
  // noise
  const tn=mv?(sprint?.7:.25):0;P.noise+=(tn-P.noise)*Math.min(1,dt*8);
  // toys + carry
- for(const t of toys){if(t.carried)continue;const d=Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z);
-  if(d<.7&&P.y<.3){if(!t.hot){t.hot=true;squeak(P.x,P.z);}}else if(d>1.3)t.hot=false;}
- if(keys.KeyE){if(!held){let b=null,bd=2.2;for(const t of toys){if(t.carried)continue;const d=Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z);if(d<bd){bd=d;b=t;}}
+ for(const t of toys){if(t.carried||t.dead)continue;const d=Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z);
+  if(d<.7&&P.y<.3){if(!t.hot){t.hot=true;hitItem(t);}}else if(d>1.3)t.hot=false;}
+ if(keys.KeyE){if(!held){let b=null,bd=2.2;for(const t of toys){if(t.carried||t.dead)continue;const d=Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z);if(d<bd){bd=d;b=t;}}
    if(b){held=b;b.carried=true;b.hot=false;}}}
- else if(held){held.carried=false;held.m.position.set(P.x-Math.sin(P.yaw)*1.4,.15,P.z-Math.cos(P.yaw)*1.4);held.hot=true;held=null;}
+ else if(held){held.carried=false;held.m.position.set(P.x-Math.sin(P.yaw)*1.4,.15,P.z-Math.cos(P.yaw)*1.4);held.hot=true;if(held.kind==='vase')hitItem(held);held=null;}
  // dogs
  if(updateDogs(dt,safe))return;
  if(P.z<-LEN){P.won=true;$('msg').textContent='You made it! Level 1 clear. Press R to play again.';}
