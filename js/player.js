@@ -10,8 +10,10 @@ const $=id=>document.getElementById(id);
 function reset(){Object.assign(P,{x:0,y:0,z:0,vy:0,yaw:0,pit:0,stam:1,tired:false,bites:0,slow:0,noise:0,won:false});
  for(const d of dogs){Object.assign(d,{x:d.hx,z:d.hz,st:0,al:0,lose:0,ret:false,cd:0});}
  for(const t of toys){t.carried=false;t.hot=false;t.dead=false;t.m.position.set(t.hx,t.y0,t.hz);t.m.visible=true;}held=null;$('msg').textContent='';}
-addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space'||e.code.startsWith('Arrow'))e.preventDefault();if(e.code==='KeyR')reset();});
-addEventListener('keyup',e=>keys[e.code]=false);
+/* Alternate keys for remote/keyboard-limited users: 5 = hold (E), 0 = jump (Space), on top row and numpad */
+const ALIAS={Digit5:'KeyE',Numpad5:'KeyE',Digit0:'Space',Numpad0:'Space'};
+addEventListener('keydown',e=>{const c=ALIAS[e.code]||e.code;keys[c]=true;if(c==='Space'||c.startsWith('Arrow'))e.preventDefault();if(c==='KeyR')reset();});
+addEventListener('keyup',e=>{keys[ALIAS[e.code]||e.code]=false;});
 $('ov').onclick=()=>{AC=AC||new(window.AudioContext||window.webkitAudioContext)();R.domElement.requestPointerLock&&R.domElement.requestPointerLock();$('ov').style.display='none';locked=true;};
 document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement!==R.domElement){locked=false;$('ov').style.display='flex';}});
 addEventListener('mousemove',e=>{if(document.pointerLockElement===R.domElement){P.yaw-=e.movementX*.0025;P.pit=Math.max(-1.3,Math.min(1.3,P.pit-e.movementY*.0025));}});

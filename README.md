@@ -12,8 +12,8 @@ Open `index.html` in a browser, or enable GitHub Pages (Settings → Pages → `
 | WASD / arrows | Move |
 | Mouse | Look (click to capture, Esc to release) |
 | Shift | Sprint (louder, drains stamina) |
-| Space | Jump |
-| E (hold) | Carry a toy; release to drop |
+| Space or 0 | Jump |
+| E or 5 (hold) | Carry a toy or vase; release to drop |
 | R | Restart |
 
 ## Rules
