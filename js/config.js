@@ -1,2 +1,2 @@
 /* Game constants */
-const LEN=60;
+let LEN=60;

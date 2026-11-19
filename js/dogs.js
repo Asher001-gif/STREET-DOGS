@@ -1,7 +1,7 @@
 /* Dogs: creation, wake/chase/return AI, bites, noise reactions */
 // dogs
 const dogs=[];
-for(const[x,z]of[[-2,-14],[3,-31],[-3,-47]]){
+function makeDog(x,z){
  const g=new THREE.Group();
  const head=model('dog',.5,0x2a1c1c);S.remove(head);g.add(head);
  const ind=new THREE.Mesh(new THREE.SphereGeometry(.12,6,4),new THREE.MeshBasicMaterial({color:0x44ff88}));ind.position.y=1.3;g.add(ind);

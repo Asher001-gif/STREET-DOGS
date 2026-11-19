@@ -13,7 +13,8 @@ function render(dt){
  sh.position.set(P.x,groundAt(P.x,P.y+.3)+.03,P.z);
  $('nf').style.width=(P.noise*100)+'%';$('sf').style.width=(P.stam*100)+'%';
  const n=[0,0,0];for(const d of dogs)n[d.st]++;
- $('dogs').innerHTML='Dogs<br>🟢 asleep: '+n[0]+'<br>🟡 ear twitch: '+n[1]+'<br>🔴 awake: '+n[2]+'<br>Bites: '+P.bites+'/2<br>Distance left: '+Math.max(0,Math.round(LEN+P.z))+' m';
+ $('dogs').innerHTML=LEVELS[LV].name+' / '+LEVELS.length+'<br>Dogs<br>🟢 asleep: '+n[0]+'<br>🟡 ear twitch: '+n[1]+'<br>🔴 awake: '+n[2]+'<br>Bites: '+P.bites+'/2<br>Distance left: '+Math.max(0,Math.round(LEN+P.z))+' m';
  const fl=$('flash');fl.style.opacity=Math.max(0,fl.style.opacity-dt*1.5);
  R.render(S,cam);}
+loadLevel(Math.min(LEVELS.length,Math.max(1,parseInt(location.hash.slice(1))||1))-1); // #2 in the URL starts at level 2
 requestAnimationFrame(loop);

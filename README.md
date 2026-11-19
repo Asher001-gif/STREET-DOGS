@@ -31,6 +31,8 @@ js/config.js    constants
 js/assets.js    baked models + textures (generated)
 js/engine.js    renderer, scene, camera, mesh helpers
 js/audio.js     procedural sounds
+js/levels.js    level data (dogs, props, beds, toys, vases)
+js/level.js     loads/clears a level
 js/world.js     street, lamps, crates, toys
 js/dogs.js      dog AI, noise reactions, bites
 js/player.js    input, movement, physics
@@ -41,4 +43,5 @@ assets/ holds the source models (glb/fbx) and textures. After changing them run 
 
 ## Status
 - [x] Level 1
-- [ ] Levels 2-5 (vases, net, gaps, heavy crates)
+- [x] Level 2 (beds to drag or climb, 5 dogs). Open `index.html#2` to jump straight to it
+- [ ] Levels 3-5 (net, gaps, more dogs)
