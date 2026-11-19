@@ -1,0 +1,32 @@
+name: Build Game for Itch
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Plain HTML/CSS/JS (no npm, no bundler), so "build" = copy the game files.
+      # itch.io needs index.html at the root of the zip. assets/ and tools/ are
+      # source-only (models are already baked into js/assets.js), so they stay out.
+      - name: Assemble dist
+        run: |
+          mkdir dist
+          cp index.html dist/
+          cp -r css js dist/
+          test -f dist/index.html
+
+      # upload-artifact zips dist/ for you, with index.html at the zip root.
+      - name: Upload Zip for Itch.io
+        uses: actions/upload-artifact@v4
+        with:
+          name: itch-game-zip
+          path: dist/
