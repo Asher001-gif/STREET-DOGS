@@ -9,8 +9,13 @@ function render(dt){
   d.g.scale.y=d.st===0?.78:1;d.head.rotation.z=d.st===1?Math.sin(performance.now()/60)*.12:0;}
  for(const t of toys)t.m.visible=!t.dead;
  if(held){held.m.position.set(P.x-Math.sin(P.yaw)*.6+Math.cos(P.yaw)*.3,P.y+1.2,P.z-Math.cos(P.yaw)*.6-Math.sin(P.yaw)*-.3);}
- cam.position.set(P.x,P.y+1.6,P.z);cam.rotation.set(P.pit,P.yaw,0,'YXZ');torch.position.set(P.x,P.y+2,P.z);
+ const bob=(P.mv&&P.vy===0&&!P.won)?Math.sin(performance.now()/110)*.035*(P.spr?1.6:1):0;
+ cam.fov+=((P.spr&&P.mv?82:75)-cam.fov)*.12;cam.updateProjectionMatrix();
+ cam.position.set(P.x,P.y+1.6+bob,P.z);sky.position.copy(cam.position);cam.rotation.set(P.pit,P.yaw,0,'YXZ');torch.position.set(P.x,P.y+2,P.z);
  sh.position.set(P.x,groundAt(P.x,P.y+.3)+.03,P.z);
+ const toyNear=!held&&!drag&&toys.some(t=>!t.carried&&!t.dead&&Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z)<2.2);
+ const pr=held?'Release to drop':drag?'Release to let go':toyNear?'Hold E (or 5) to pick up':(!held&&nearHeavy())?'Hold E (or 5) to drag':'';
+ $('prompt').textContent=pr;$('prompt').style.opacity=pr?1:0;
  $('nf').style.width=(P.noise*100)+'%';$('sf').style.width=(P.stam*100)+'%';
  const n=[0,0,0];for(const d of dogs)n[d.st]++;
  $('dogs').innerHTML=LEVELS[LV].name+' / '+LEVELS.length+'<br>Dogs<br>🟢 asleep: '+n[0]+'<br>🟡 ear twitch: '+n[1]+'<br>🔴 awake: '+n[2]+'<br>Bites: '+P.bites+'/2<br>Distance left: '+Math.max(0,Math.round(LEN+P.z))+' m';

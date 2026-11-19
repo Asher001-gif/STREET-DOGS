@@ -5,7 +5,7 @@ function makeDog(x,z){
  const g=new THREE.Group();
  const head=model('dog',.5,0x2a1c1c);S.remove(head);g.add(head);
  const ind=new THREE.Mesh(new THREE.SphereGeometry(.12,6,4),new THREE.MeshBasicMaterial({color:0x44ff88}));ind.position.y=1.3;g.add(ind);
- g.position.set(x,0,z);g.rotation.y=Math.random()*6;S.add(g);
+ blobShadow(g,1);g.position.set(x,0,z);g.rotation.y=Math.random()*6;S.add(g);
  dogs.push({g,head,ind,hx:x,hz:z,x,z,st:0,al:0,lose:0,ret:false,cd:0,base:4});}
 
 function hitItem(t){if(t.kind==='vase'){t.dead=true;t.m.visible=false;snd(500,.5,'sawtooth',.2);snd(2200,.25,'square',.08);P.noise=1;

@@ -44,6 +44,7 @@ function update(dt){
  P.vy-=18*dt;P.y+=P.vy*dt;const g2=groundAt(P.x,P.y+.3);if(P.y<g2){P.y=g2;P.vy=0;}
  const safe=P.y>=.7&&g2>=.8;
  // noise
+ P.mv=!!mv;P.spr=sprint;
  const tn=mv?(drag?.5:sprint?.7:.25):0;P.noise+=(tn-P.noise)*Math.min(1,dt*8);
  // toys + carry
  for(const t of toys){if(t.carried||t.dead)continue;const d=Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z);

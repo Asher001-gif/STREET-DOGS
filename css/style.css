@@ -11,3 +11,13 @@ canvas{display:block}
 #ov{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer}
 #ov div{max-width:420px;line-height:1.6;padding:20px}
 h1{margin:0 0 8px;font-size:30px}
+
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,#000b 100%)}
+#cross{position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:#ffffffaa}
+#prompt{position:absolute;left:0;right:0;bottom:64px;text-align:center;font-size:14px;letter-spacing:.04em;text-shadow:0 1px 4px #000;opacity:0;transition:opacity .15s}
+#dogs{background:#0b1020b0;border:1px solid #2a3556;border-radius:10px}
+.bar{border-color:#3b4668;background:#0b1020cc}
+#nf{background:linear-gradient(90deg,#ffd27a,#ff8a3d,#ff4d4d)}
+#sf{background:#7fd6ff}
+#ov{background:radial-gradient(circle at 50% 40%,#1a2140ee,#05070fee)}
+h1{letter-spacing:.08em;text-transform:uppercase}
