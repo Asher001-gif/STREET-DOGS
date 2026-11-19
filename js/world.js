@@ -25,6 +25,14 @@ function bed(x,z,ry){const g=new THREE.Group();const a=ASSETS.mattress.size;
  for(let k=0;k<6;k++){const mm=model('mattress',1);S.remove(mm);mm.position.y=k*a[1];g.add(mm);}
  g.rotation.y=ry;S.add(g);const q=Math.abs(Math.sin(ry))>.5;
  const p={w:(q?a[2]:a[0])/2,d:(q?a[0]:a[2])/2,top:a[1]*6,m:g,heavy:true,hx:x,hz:z};setRect(p,x,z);plats.push(p);return p;}
+// net: a rope net on four posts. Jump onto it: it is a safe spot (dogs cannot climb nets)
+function net(x,z,w,d){const g=new THREE.Group(),h=1;
+ for(const[px,pz]of[[-1,-1],[1,-1],[-1,1],[1,1]]){const m=box(.1,h,.1,0x555a66,0,0,0);S.remove(m);m.position.set(px*w/2,h/2,pz*d/2);g.add(m);}
+ const v=[];for(let i=0;i<=w/.35;i++){const a=-w/2+i*.35;v.push(a,h,-d/2,a,h,d/2);}
+ for(let j=0;j<=d/.35;j++){const b=-d/2+j*.35;v.push(-w/2,h,b,w/2,h,b);}
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
+ g.add(new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:0xc4cce6})));S.add(g);
+ const p={w:w/2,d:d/2,top:h,m:g,heavy:false,hx:x,hz:z};setRect(p,x,z);plats.push(p);return p;}
 // carryable items: toys squeak when stepped on, vases shatter when bumped or dropped
 function addToy(x,z){const m=box(.4,.3,.4,0xff4fa0,x,.15,z,0x551133);toys.push({m,kind:'toy',y0:.15,hx:x,hz:z,carried:false,hot:false,dead:false});}
 function addVase(x,z){const m=model('vase',1.8);m.position.set(x,0,z);toys.push({m,kind:'vase',y0:0,hx:x,hz:z,carried:false,hot:false,dead:false});}

@@ -44,4 +44,5 @@ assets/ holds the source models (glb/fbx) and textures. After changing them run 
 ## Status
 - [x] Level 1
 - [x] Level 2 (beds to drag or climb, 5 dogs). Open `index.html#2` to jump straight to it
-- [ ] Levels 3-5 (net, gaps, more dogs)
+- [x] Level 3 (vase rows to jump over, nets as safe spots, dogs on both sides)
+- [ ] Levels 4-5 (gaps, heavy crate to move, long street with everything)
