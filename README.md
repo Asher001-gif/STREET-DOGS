@@ -16,6 +16,17 @@ Open `index.html` in a browser, or enable GitHub Pages (Settings → Pages → `
 | E or 5 (hold) | Carry a toy or vase; release to drop |
 | R | Restart |
 
+### Touch (phones/tablets)
+| Control | Action |
+|---|---|
+| Left thumb joystick | Move (push past the ring to sprint) |
+| Drag on the right half | Look around |
+| Press and hold on the right half (don't move) | Carry a toy or vase / drag a bed; lift to drop |
+| Jump button (bottom right) | Jump |
+| ↻ (top right) | Restart |
+
+On a desktop, add `?touch=1` to the URL to preview the touch controls.
+
 ## Rules
 1. Dogs sleep; get inside a dog's wake distance and it wakes.
 2. Noise matters: walking is quiet, sprinting is louder, squeaky toys wake nearby dogs.
@@ -36,6 +47,7 @@ js/level.js     loads/clears a level
 js/world.js     street, lamps, crates, toys
 js/dogs.js      dog AI, noise reactions, bites
 js/player.js    input, movement, physics
+js/touch.js     touch controls (joystick, jump, hold, look)
 js/main.js      game loop, HUD
 ```
 

@@ -9,5 +9,5 @@ function loadLevel(i){
  for(const[x,z]of L.toys)addToy(x,z);
  for(const[x,z]of L.vases)addVase(x,z);
  for(const[x,z]of L.dogs)makeDog(x,z);
- reset();$('msg').textContent=L.hint;
+ reset();$('msg').textContent=L.hint.replace('Hold E (or 5)',HK);
  if(L.hint)setTimeout(()=>{if(!P.won)$('msg').textContent='';},7000);}

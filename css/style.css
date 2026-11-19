@@ -21,3 +21,40 @@ h1{margin:0 0 8px;font-size:30px}
 #sf{background:#7fd6ff}
 #ov{background:radial-gradient(circle at 50% 40%,#1a2140ee,#05070fee)}
 h1{letter-spacing:.08em;text-transform:uppercase}
+
+/* ---- Touch controls (js/touch.js) ---- */
+#ov{z-index:9}
+#tc{display:none;position:fixed;inset:0;z-index:2;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+body.touch{overscroll-behavior:none;touch-action:none}
+body.touch #tc{display:block}
+.tzone{position:absolute;top:0;bottom:0;width:50%;touch-action:none}
+#tl{left:0}#tr{right:0}
+
+/* glass look shared by stick, buttons and pill */
+.tbase,.tbtn,.tpill{background:radial-gradient(circle at 50% 35%,#ffffff1c,#ffffff08 70%);border:1.5px solid #9fb0dd55;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);box-shadow:0 4px 18px #0006,inset 0 1px 0 #ffffff22;color:#dfe6ff}
+
+.tbase{position:absolute;width:124px;height:124px;margin:-62px 0 0 -62px;border-radius:50%;opacity:.4;pointer-events:none;transition:opacity .18s,box-shadow .18s,border-color .18s}
+.tbase.on{opacity:.9}
+.tbase.sprint{border-color:#7fd6ffcc;box-shadow:0 0 0 2px #7fd6ff55,0 0 22px #7fd6ff66,inset 0 1px 0 #ffffff22}
+.tknob{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#e4ecff,#8197cc 75%);border:1px solid #ffffff66;box-shadow:0 3px 12px #0009;will-change:transform}
+
+.tbtn{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:50%;opacity:.7;z-index:3;touch-action:none;transition:transform .08s,opacity .12s,background .12s}
+.tbtn.on{opacity:1;transform:scale(.92);background:radial-gradient(circle at 50% 35%,#7fd6ff55,#7fd6ff1c 70%);border-color:#7fd6ffaa}
+#tjump{width:78px;height:78px;right:calc(env(safe-area-inset-right,0px) + 30px);bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
+#trst{width:40px;height:40px;top:calc(env(safe-area-inset-top,0px) + 12px);right:calc(env(safe-area-inset-right,0px) + 12px);opacity:.55}
+
+/* hold indicator that follows the finger */
+.thold{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;border:2px solid #7fd6ffbb;background:radial-gradient(circle,#7fd6ff30,#7fd6ff08 70%);box-shadow:0 0 20px #7fd6ff55;opacity:0;transform:scale(1.5);pointer-events:none;transition:opacity .15s,transform .15s}
+.thold.on{opacity:1;transform:scale(1)}
+
+.tpill{position:absolute;left:50%;top:60%;transform:translate(-50%,8px);padding:13px 26px;border-radius:999px;font-size:15px;letter-spacing:.06em;text-transform:uppercase;border-color:#7fd6ff88;opacity:0;pointer-events:none;z-index:3;transition:opacity .2s,transform .2s;white-space:pre}
+.tpill.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.tpill:active{background:radial-gradient(circle,#7fd6ff44,#7fd6ff12)}
+
+/* compact HUD on touch screens so it stays clear of the controls */
+body.touch #dogs{left:calc(env(safe-area-inset-left,0px) + 10px);top:calc(env(safe-area-inset-top,0px) + 10px);font-size:11px;line-height:1.45;padding:6px 9px}
+body.touch .bar{width:180px;margin-left:-90px}
+body.touch #lbl{margin-left:-90px}
+body.touch #msg{font-size:17px;padding:0 24px;box-sizing:border-box;top:34%}
+body.touch #prompt{bottom:70px}
+body.touch #ov small{opacity:.6}

@@ -5,7 +5,10 @@ const sh=new THREE.Mesh(new THREE.CircleGeometry(.35,10),new THREE.MeshBasicMate
 let held=null,drag=null; // drag = heavy prop (bed) being pulled/pushed
 // player
 const P={x:0,y:0,z:0,vy:0,yaw:0,pit:0,stam:1,tired:false,bites:0,slow:0,noise:0,won:false,clear:false};
-const keys={};let locked=false,AC=null,bite_cd=0;
+const keys={};
+// touch input (written by js/touch.js): x/y = joystick -1..1 (y up = forward), sprint/jump/hold = buttons
+const TI={x:0,y:0,sprint:false,jump:false,hold:false};
+let locked=false,AC=null,bite_cd=0;
 const $=id=>document.getElementById(id);
 function reset(){Object.assign(P,{x:0,y:0,z:0,vy:0,yaw:0,pit:0,stam:1,tired:false,bites:0,slow:0,noise:0,won:false,clear:false});
  for(const d of dogs){Object.assign(d,{x:d.hx,z:d.hz,st:0,al:0,lose:0,ret:false,cd:0});}
@@ -29,31 +32,32 @@ function nearHeavy(){let b=null,bd=1.3;for(const p of plats){if(!p.heavy||P.y>.3
  const d=Math.hypot(Math.max(p.x0-P.x,0,P.x-p.x1),Math.max(p.z0-P.z,0,P.z-p.z1));if(d<bd){bd=d;b=p;}}return b;}
 let jumpLatch=false;
 function update(dt){
- const f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),s=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0);
- const mv=f||s;let sprint=false;
- if(keys.ShiftLeft||keys.ShiftRight){if(mv&&P.stam>0&&!P.tired){sprint=true;P.stam-=dt*.35;if(P.stam<=0){P.stam=0;P.tired=true;}}}
+ const f=Math.max(-1,Math.min(1,(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0)+TI.y)),s=Math.max(-1,Math.min(1,(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+TI.x));
+ const mv=f||s,mag=Math.min(1,Math.hypot(f,s));let sprint=false; // mag: 1 for keys, 0..1 for the analog stick
+ if(keys.ShiftLeft||keys.ShiftRight||TI.sprint){if(mv&&P.stam>0&&!P.tired){sprint=true;P.stam-=dt*.35;if(P.stam<=0){P.stam=0;P.tired=true;}}}
  if(!sprint){P.stam=Math.min(1,P.stam+dt*.25);if(P.tired&&P.stam>.3)P.tired=false;}
  let sp=(sprint?7:4)*(P.slow>0?.5:1)*(drag?.3:1);P.slow=Math.max(0,P.slow-dt);
  if(mv){const l=Math.hypot(f,s),sn=Math.sin(P.yaw),cs=Math.cos(P.yaw);
-  const dx=(-sn*f+cs*s)/l*sp*dt,dz=(-cs*f-sn*s)/l*sp*dt;
+  const dx=(-sn*f+cs*s)/l*sp*mag*dt,dz=(-cs*f-sn*s)/l*sp*mag*dt;
   let nx=Math.max(-5.8,Math.min(5.8,P.x+dx));if(!blocked(nx,P.z)&&dragMove(nx-P.x,0))P.x=nx;
   let nz=P.z+dz;if(nz>.5)nz=.5;if(!blocked(P.x,nz)&&dragMove(0,nz-P.z))P.z=nz;}
  // jump / gravity
  const g=groundAt(P.x,P.y);
- if(keys.Space&&P.y<=g+.01&&!jumpLatch){P.vy=6.5;jumpLatch=true;}if(!keys.Space)jumpLatch=false;
+ const jk=keys.Space||TI.jump;
+ if(jk&&P.y<=g+.01&&!jumpLatch){P.vy=6.5;jumpLatch=true;}if(!jk)jumpLatch=false;
  P.vy-=18*dt;P.y+=P.vy*dt;const g2=groundAt(P.x,P.y+.3);if(P.y<g2){P.y=g2;P.vy=0;}
  const safe=P.y>=.7&&g2>=.8;
  // noise
  P.mv=!!mv;P.spr=sprint;
- const tn=mv?(drag?.5:sprint?.7:.25):0;P.noise+=(tn-P.noise)*Math.min(1,dt*8);
+ const tn=mv?(drag?.5:sprint?.7:.25*Math.max(.4,mag)):0;P.noise+=(tn-P.noise)*Math.min(1,dt*8);
  // toys + carry
  for(const t of toys){if(t.carried||t.dead)continue;const d=Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z);
   if(d<.7&&P.y<.3){if(!t.hot){t.hot=true;hitItem(t);}}else if(d>1.3)t.hot=false;}
- if(keys.KeyE){if(!held){let b=null,bd=2.2;for(const t of toys){if(t.carried||t.dead)continue;const d=Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z);if(d<bd){bd=d;b=t;}}
+ if(keys.KeyE||TI.hold){if(!held){let b=null,bd=2.2;for(const t of toys){if(t.carried||t.dead)continue;const d=Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z);if(d<bd){bd=d;b=t;}}
    if(b){held=b;b.carried=true;b.hot=false;}else if(!drag)drag=nearHeavy();}}
  else{drag=null;if(held){held.carried=false;held.m.position.set(P.x-Math.sin(P.yaw)*1.4,.15,P.z-Math.cos(P.yaw)*1.4);held.hot=true;if(held.kind==='vase')hitItem(held);held=null;}}
  // dogs
  if(updateDogs(dt,safe))return;
- if(P.z<-LEN){P.won=true;P.clear=true;$('msg').textContent=LV<LEVELS.length-1?'Level '+(LV+1)+' clear! Press Enter for the next level.':'You cleared every level! Press R to play again.';}
+ if(P.z<-LEN){P.won=true;P.clear=true;$('msg').textContent=LV<LEVELS.length-1?'Level '+(LV+1)+' clear! '+(TOUCH?'Tap Next level.':'Press Enter for the next level.'):'You cleared every level! '+(TOUCH?'Tap Play again.':'Press R to play again.');}
  else if(P.slow>0&&!P.won)$('msg').textContent='';
 }

@@ -14,7 +14,7 @@ function render(dt){
  cam.position.set(P.x,P.y+1.6+bob,P.z);sky.position.copy(cam.position);cam.rotation.set(P.pit,P.yaw,0,'YXZ');torch.position.set(P.x,P.y+2,P.z);
  sh.position.set(P.x,groundAt(P.x,P.y+.3)+.03,P.z);
  const toyNear=!held&&!drag&&toys.some(t=>!t.carried&&!t.dead&&Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z)<2.2);
- const pr=held?'Release to drop':drag?'Release to let go':toyNear?'Hold E (or 5) to pick up':(!held&&nearHeavy())?'Hold E (or 5) to drag':'';
+ const pr=held?'Release to drop':drag?'Release to let go':toyNear?HK+' to pick up':(!held&&nearHeavy())?HK+' to drag':'';
  $('prompt').textContent=pr;$('prompt').style.opacity=pr?1:0;
  $('nf').style.width=(P.noise*100)+'%';$('sf').style.width=(P.stam*100)+'%';
  const n=[0,0,0];for(const d of dogs)n[d.st]++;
