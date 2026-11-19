@@ -1,1 +1,35 @@
-# STREET-DOGS
+# Escape the Dog
+
+Cross a dark street full of sleeping dogs without waking them. If they wake, climb to safety.
+Low-poly, first-person, built to run on old machines (no build step, no dependencies to install).
+
+## Play
+Open `index.html` in a browser, or enable GitHub Pages (Settings → Pages → `main` / root).
+
+## Controls
+| Key | Action |
+|---|---|
+| WASD / arrows | Move |
+| Mouse | Look (click to capture, Esc to release) |
+| Shift | Sprint (louder, drains stamina) |
+| Space | Jump |
+| E (hold) | Carry a toy; release to drop |
+| R | Restart |
+
+## Rules
+1. Dogs sleep; get inside a dog's wake distance and it wakes.
+2. Noise matters: walking is quiet, sprinting is louder, squeaky toys wake nearby dogs.
+3. Awake dogs chase you and are faster than your sprint.
+4. Stand on a crate (safe spot) and dogs lose interest after a few seconds.
+5. Reach the green gate to win. One bite slows you; a second restarts the level.
+
+## Structure
+```
+index.html     page shell + HUD markup
+css/style.css  HUD and overlay styles
+js/game.js     world, player, dogs, noise, loop
+```
+
+## Status
+- [x] Level 1
+- [ ] Levels 2-5 (vases, net, gaps, heavy crates)

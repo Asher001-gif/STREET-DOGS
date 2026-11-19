@@ -1,0 +1,115 @@
+/* Escape the Dog - Level 1 */
+const LEN=60;
+const R=new THREE.WebGLRenderer({antialias:false,powerPreference:'low-power'});
+R.setPixelRatio(1);R.setSize(innerWidth,innerHeight);document.body.appendChild(R.domElement);
+const S=new THREE.Scene();S.background=new THREE.Color(0x060914);S.fog=new THREE.Fog(0x060914,6,38);
+const cam=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,60);
+S.add(new THREE.HemisphereLight(0x6677bb,0x151525,.9));
+const torch=new THREE.PointLight(0xffe0a0,.5,14);S.add(torch);
+const mat=(c,e)=>new THREE.MeshLambertMaterial({color:c,flatShading:true,emissive:e||0});
+const box=(w,h,d,c,x,y,z,e)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c,e));m.position.set(x,y,z);S.add(m);return m};
+// world
+box(14,.2,100,0x1c2030,0,-.1,-30);
+box(5,.3,100,0x2b3042,-9.5,-.05,-30);box(5,.3,100,0x2b3042,9.5,-.05,-30);
+for(let i=0;i<7;i++)for(const s of[-1,1]){const h=7+((i*7+(s>0?3:0))%5)*2;box(7,h,12,s<0?0x141a30:0x171428,s*13,h/2,-4-i*14);
+ for(let k=0;k<3;k++)if((i+k+(s>0))%2)box(.1,.9,1,0xffd27a,s*9.45,2+k*2.2,-4-i*14+(k-1)*3,0xaa8830);}
+box(.4,4,.4,0x33ee77,-6,2,-LEN,0x22aa55);box(.4,4,.4,0x33ee77,6,2,-LEN,0x22aa55);box(12.4,.4,.4,0x33ee77,0,4,-LEN,0x22aa55);
+for(let z=-6,i=0;z>-66;z-=14,i++){const x=i%2?6.3:-6.3;box(.15,4.5,.15,0x444455,x,2.25,z);box(.5,.3,.5,0xffd27a,x,4.6,z,0xffc860);
+ const p=new THREE.Mesh(new THREE.CircleGeometry(4.5,12),new THREE.MeshBasicMaterial({color:0xffc860,transparent:true,opacity:.13}));p.rotation.x=-Math.PI/2;p.position.set(x,.02,z);S.add(p);}
+// crates (safe spots)
+const plats=[];
+for(const[x,z]of[[4,-18],[-4.2,-36],[3.5,-52]]){box(2.2,.9,2.2,0x7a5532,x,.45,z);plats.push({x0:x-1.1,x1:x+1.1,z0:z-1.1,z1:z+1.1,top:.9});}
+// toys
+const toys=[];
+for(const[x,z]of[[1,-8],[-4,-22],[2,-27],[-1,-40],[4,-43]]){const m=box(.4,.3,.4,0xff4fa0,x,.15,z,0x551133);toys.push({m,hx:x,hz:z,carried:false,hot:false});}
+// dogs
+const dogs=[];
+for(const[x,z]of[[-2,-14],[3,-31],[-3,-47]]){
+ const g=new THREE.Group();const c=0x9a7b55;
+ const add=(w,h,d,px,py,pz,col)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(col||c));m.position.set(px,py,pz);g.add(m);return m};
+ add(.5,.45,1);const head=add(.4,.38,.4,0,.25,.65);add(.12,.2,.1,-.14,.52,.65,0x5a4430);add(.12,.2,.1,.14,.52,.65,0x5a4430);add(.1,.1,.4,0,.1,-.7,0x5a4430);
+ const ind=new THREE.Mesh(new THREE.SphereGeometry(.12,6,4),new THREE.MeshBasicMaterial({color:0x44ff88}));ind.position.y=1.4;g.add(ind);
+ g.position.set(x,.3,z);g.rotation.y=Math.random()*6;S.add(g);
+ dogs.push({g,head,ind,hx:x,hz:z,x,z,st:0,al:0,lose:0,ret:false,cd:0,base:4});}
+// shadow marker
+const sh=new THREE.Mesh(new THREE.CircleGeometry(.35,10),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.5}));sh.rotation.x=-Math.PI/2;S.add(sh);
+// carried toy
+let held=null;
+// player
+const P={x:0,y:0,z:0,vy:0,yaw:0,pit:0,stam:1,tired:false,bites:0,slow:0,noise:0,won:false};
+const keys={};let locked=false,AC=null,bite_cd=0;
+function snd(f,d,t,v){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.stop(AC.currentTime+d);}
+const $=id=>document.getElementById(id);
+function reset(){Object.assign(P,{x:0,y:0,z:0,vy:0,yaw:0,pit:0,stam:1,tired:false,bites:0,slow:0,noise:0,won:false});
+ for(const d of dogs){Object.assign(d,{x:d.hx,z:d.hz,st:0,al:0,lose:0,ret:false,cd:0});}
+ for(const t of toys){t.carried=false;t.hot=false;t.m.position.set(t.hx,.15,t.hz);t.m.visible=true;}held=null;$('msg').textContent='';}
+addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space'||e.code.startsWith('Arrow'))e.preventDefault();if(e.code==='KeyR')reset();});
+addEventListener('keyup',e=>keys[e.code]=false);
+$('ov').onclick=()=>{AC=AC||new(window.AudioContext||window.webkitAudioContext)();R.domElement.requestPointerLock&&R.domElement.requestPointerLock();$('ov').style.display='none';locked=true;};
+document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement!==R.domElement){locked=false;$('ov').style.display='flex';}});
+addEventListener('mousemove',e=>{if(document.pointerLockElement===R.domElement){P.yaw-=e.movementX*.0025;P.pit=Math.max(-1.3,Math.min(1.3,P.pit-e.movementY*.0025));}});
+addEventListener('resize',()=>{R.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();});
+function groundAt(x,y){let g=0;for(const p of plats)if(x>p.x0-.3&&x<p.x1+.3&&P.z>p.z0-.3&&P.z<p.z1+.3&&y>=p.top-.3)g=Math.max(g,p.top);return g;}
+function blocked(x,z){for(const p of plats)if(x>p.x0-.35&&x<p.x1+.35&&z>p.z0-.35&&z<p.z1+.35&&P.y<p.top-.3)return true;return false;}
+let last=performance.now(),jumpLatch=false;
+function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;
+ if(locked&&!P.won)update(dt);
+ render(dt);}
+function update(dt){
+ const f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),s=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0);
+ const mv=f||s;let sprint=false;
+ if(keys.ShiftLeft||keys.ShiftRight){if(mv&&P.stam>0&&!P.tired){sprint=true;P.stam-=dt*.35;if(P.stam<=0){P.stam=0;P.tired=true;}}}
+ if(!sprint){P.stam=Math.min(1,P.stam+dt*.25);if(P.tired&&P.stam>.3)P.tired=false;}
+ let sp=(sprint?7:4)*(P.slow>0?.5:1);P.slow=Math.max(0,P.slow-dt);
+ if(mv){const l=Math.hypot(f,s),sn=Math.sin(P.yaw),cs=Math.cos(P.yaw);
+  const dx=(-sn*f+cs*s)/l*sp*dt,dz=(-cs*f-sn*s)/l*sp*dt;
+  let nx=Math.max(-5.8,Math.min(5.8,P.x+dx));if(!blocked(nx,P.z))P.x=nx;
+  let nz=P.z+dz;if(nz>.5)nz=.5;if(!blocked(P.x,nz))P.z=nz;}
+ // jump / gravity
+ const g=groundAt(P.x,P.y);
+ if(keys.Space&&P.y<=g+.01&&!jumpLatch){P.vy=6.5;jumpLatch=true;}if(!keys.Space)jumpLatch=false;
+ P.vy-=18*dt;P.y+=P.vy*dt;const g2=groundAt(P.x,P.y+.3);if(P.y<g2){P.y=g2;P.vy=0;}
+ const safe=P.y>=.7&&g2>=.9;
+ // noise
+ const tn=mv?(sprint?.7:.25):0;P.noise+=(tn-P.noise)*Math.min(1,dt*8);
+ // toys + carry
+ for(const t of toys){if(t.carried)continue;const d=Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z);
+  if(d<.7&&P.y<.3){if(!t.hot){t.hot=true;squeak(P.x,P.z);}}else if(d>1.3)t.hot=false;}
+ if(keys.KeyE){if(!held){let b=null,bd=2.2;for(const t of toys){if(t.carried)continue;const d=Math.hypot(P.x-t.m.position.x,P.z-t.m.position.z);if(d<bd){bd=d;b=t;}}
+   if(b){held=b;b.carried=true;b.hot=false;}}}
+ else if(held){held.carried=false;held.m.position.set(P.x-Math.sin(P.yaw)*1.4,.15,P.z-Math.cos(P.yaw)*1.4);held.hot=true;held=null;}
+ // dogs
+ bite_cd-=dt;
+ for(const d of dogs){const dx=P.x-d.x,dz=P.z-d.z,dist=Math.hypot(dx,dz);
+  if(d.st<2){const r=d.base*(.55+P.noise);
+   if(dist<r&&!safe)d.al+=dt*1.3;else d.al=Math.max(0,d.al-dt*.6);
+   const ns=d.al>=1?2:d.al>.5?1:0;if(ns===1&&d.st===0)snd(90,.5,'sawtooth',.08);
+   if(ns===2&&d.st<2){snd(220,.35,'square',.1);d.lose=0;d.ret=false;}d.st=ns;}
+  else{ // awake
+   if(safe){d.lose+=dt;if(d.lose>4)d.ret=true;}else{d.lose=0;if(d.ret&&dist<6)d.ret=false;}
+   let tx=P.x,tz=P.z,spd=6.5;if(d.ret){tx=d.hx;tz=d.hz;spd=3;}
+   const ex=tx-d.x,ez=tz-d.z,ed=Math.hypot(ex,ez);
+   if(d.ret&&ed<.3){d.st=0;d.al=0;d.ret=false;d.lose=0;}
+   else if(ed>(d.ret?0:safe?2:.5)){d.x+=ex/ed*spd*dt;d.z+=ez/ed*spd*dt;d.g.rotation.y=Math.atan2(ex,ez);}
+   d.cd-=dt;
+   if(!d.ret&&!safe&&dist<1.2&&d.cd<=0&&bite_cd<=0){d.cd=1.5;bite_cd=1.2;P.bites++;snd(120,.2,'sawtooth',.2);$('flash').style.opacity=.55;
+    if(P.bites>=2){$('msg').textContent='Caught! Restarting…';setTimeout(reset,1200);P.won=true;return;}P.slow=4;}}}
+ if(P.z<-LEN){P.won=true;$('msg').textContent='You made it! Level 1 clear. Press R to play again.';}
+ else if(P.slow>0&&!P.won)$('msg').textContent='';
+}
+function squeak(x,z){snd(1400,.15,'sine',.15);P.noise=1;
+ for(const d of dogs)if(d.st===0&&Math.hypot(d.x-x,d.z-z)<10){d.al=1;}}
+function render(dt){
+ for(const d of dogs){d.g.position.set(d.x,.3,d.z);
+  const c=d.st===0?0x44ff88:d.st===1?0xffd23a:0xff3b3b;d.ind.material.color.setHex(c);
+  d.g.scale.y=d.st===0?.8:1;d.head.rotation.z=d.st===1?Math.sin(performance.now()/60)*.25:0;d.g.children[2].rotation.z=d.st===1?Math.sin(performance.now()/50)*.5:0;}
+ for(const t of toys)if(!t.carried)t.m.visible=true;
+ if(held){held.m.position.set(P.x-Math.sin(P.yaw)*.6+Math.cos(P.yaw)*.3,P.y+1.2,P.z-Math.cos(P.yaw)*.6-Math.sin(P.yaw)*-.3);}
+ cam.position.set(P.x,P.y+1.6,P.z);cam.rotation.set(P.pit,P.yaw,0,'YXZ');torch.position.set(P.x,P.y+2,P.z);
+ sh.position.set(P.x,groundAt(P.x,P.y+.3)+.03,P.z);
+ $('nf').style.width=(P.noise*100)+'%';$('sf').style.width=(P.stam*100)+'%';
+ const n=[0,0,0];for(const d of dogs)n[d.st]++;
+ $('dogs').innerHTML='Dogs<br>🟢 asleep: '+n[0]+'<br>🟡 ear twitch: '+n[1]+'<br>🔴 awake: '+n[2]+'<br>Bites: '+P.bites+'/2<br>Distance left: '+Math.max(0,Math.round(LEN+P.z))+' m';
+ const fl=$('flash');fl.style.opacity=Math.max(0,fl.style.opacity-dt*1.5);
+ R.render(S,cam);}
+requestAnimationFrame(loop);
