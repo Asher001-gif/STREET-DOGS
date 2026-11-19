@@ -1,0 +1,19 @@
+/* Game loop and rendering/HUD */
+let last=performance.now();
+function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;
+ if(locked&&!P.won)update(dt);
+ render(dt);}
+function render(dt){
+ for(const d of dogs){d.g.position.set(d.x,.3,d.z);
+  const c=d.st===0?0x44ff88:d.st===1?0xffd23a:0xff3b3b;d.ind.material.color.setHex(c);
+  d.g.scale.y=d.st===0?.8:1;d.head.rotation.z=d.st===1?Math.sin(performance.now()/60)*.25:0;d.g.children[2].rotation.z=d.st===1?Math.sin(performance.now()/50)*.5:0;}
+ for(const t of toys)if(!t.carried)t.m.visible=true;
+ if(held){held.m.position.set(P.x-Math.sin(P.yaw)*.6+Math.cos(P.yaw)*.3,P.y+1.2,P.z-Math.cos(P.yaw)*.6-Math.sin(P.yaw)*-.3);}
+ cam.position.set(P.x,P.y+1.6,P.z);cam.rotation.set(P.pit,P.yaw,0,'YXZ');torch.position.set(P.x,P.y+2,P.z);
+ sh.position.set(P.x,groundAt(P.x,P.y+.3)+.03,P.z);
+ $('nf').style.width=(P.noise*100)+'%';$('sf').style.width=(P.stam*100)+'%';
+ const n=[0,0,0];for(const d of dogs)n[d.st]++;
+ $('dogs').innerHTML='Dogs<br>🟢 asleep: '+n[0]+'<br>🟡 ear twitch: '+n[1]+'<br>🔴 awake: '+n[2]+'<br>Bites: '+P.bites+'/2<br>Distance left: '+Math.max(0,Math.round(LEN+P.z))+' m';
+ const fl=$('flash');fl.style.opacity=Math.max(0,fl.style.opacity-dt*1.5);
+ R.render(S,cam);}
+requestAnimationFrame(loop);
